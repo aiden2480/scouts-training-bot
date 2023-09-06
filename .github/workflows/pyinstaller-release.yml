@@ -43,5 +43,4 @@ jobs:
           body: |
             [${{ steps.vars.outputs.sha_short }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) - ${{ steps.vars.outputs.commit_msg }}
 
-            Download ScoutsTrainingBot.exe below for win-32 systems
-
+            Download ScoutsTrainingBot.exe below for windows
