@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build via pyinstaller
+    name: Build and upload
     runs-on: windows-latest
 
     steps:
@@ -16,25 +16,14 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: 3.11
-          cache: pip
-      - run: pip install -r requirements.txt
-      - run: pip install pyinstaller
+      - name: Install requirements.txt
+        run: pip install -r requirements.txt
+      - name: Install pyinstaller
+        run: pip install pyinstaller
       
       - name: Generate executable
         run: pyinstaller --onefile --icon=.github\workflows\app.ico --add-data "js/*;js" --name ScoutsTrainingBot main.py
       
-      - uses: actions/upload-artifact@v3
-        with:
-          path: dist/ScoutsTrainingBot.exe
-
-  release:
-    name: GitHub Release
-    runs-on: windows-latest
-    needs: build
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
       - name: Extract git info
         id: vars
         run: |
