@@ -21,11 +21,8 @@ jobs:
         with:
           python-version: 3.11
       
-      - name: Install requirements.txt
-        run: pip install -r requirements.txt
-      
-      - name: Install pyinstaller
-        run: pip install pyinstaller
+      - name: Install required packages
+        run: pip install -r requirements.txt pyinstaller
       
       - name: Generate executable
         run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*;js" main.py
