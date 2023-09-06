@@ -34,7 +34,7 @@ jobs:
         id: vars
         run: |
           echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-          echo "::set-output name=commit_msg::$(git show -s --no-color --pretty=format:%B ${{ github.sha }})"
+          echo "::set-output name=commit_msg::$(git show -s --no-color --pretty=format:%B HEAD)"
 
       - name: Upload Release
         uses: svenstaro/upload-release-action@2.7.0          
@@ -42,6 +42,6 @@ jobs:
           file: dist/main.exe
           asset_name: ScoutsTrainingBot.exe
           release_name: Scouts Training Bot • ${{ steps.vars.outputs.sha_short }}
-          tag: ${{ github.sha }}
+          tag: ${{ steps.vars.outputs.sha_short }}
           body: |
             [${{ steps.vars.outputs.sha_short }} - ${{ steps.vars.outputs.commit_msg }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
