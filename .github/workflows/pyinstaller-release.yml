@@ -41,4 +41,7 @@ jobs:
           release_name: Scouts Training Bot • ${{ steps.vars.outputs.sha_short }}
           tag: ${{ steps.vars.outputs.sha_short }}
           body: |
-            [${{ steps.vars.outputs.sha_short }} - ${{ steps.vars.outputs.commit_msg }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            [${{ steps.vars.outputs.sha_short }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) - ${{ steps.vars.outputs.commit_msg }}
+
+            Download ScoutsTrainingBot.exe below for win-32 systems
+
