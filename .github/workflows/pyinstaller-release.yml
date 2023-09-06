@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
@@ -22,7 +21,7 @@ jobs:
         run: pip install pyinstaller
       
       - name: Generate executable
-        run: pyinstaller --onefile --icon=.github\workflows\app.ico --add-data "js/*;js" --name ScoutsTrainingBot main.py
+        run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*;js" --name=ScoutsTrainingBot main.py
       
       - name: Extract git info
         id: vars
@@ -30,10 +29,9 @@ jobs:
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "commit_msg=$(git show -s --no-color --pretty=format:%B ${{ github.sha }})" >> $GITHUB_OUTPUT
 
-      - uses: svenstaro/upload-release-action@2.7.0
+      - uses: softprops/action-gh-release@v1
         with:
-          file: dist/ScoutsTrainingBot.exe
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          release_name: Scouts Training Bot v-${{ steps.vars.outputs.sha_short }}
+          files: dist/ScoutsTrainingBot.exe
+          name: Scouts Training Bot v-${{ steps.vars.outputs.sha_short }}
           body: |
             [${{ steps.vars.outputs.commit_msg }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
