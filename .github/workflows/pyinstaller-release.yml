@@ -9,6 +9,8 @@ jobs:
   build:
     name: Build and upload
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -29,9 +31,10 @@ jobs:
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "commit_msg=$(git show -s --no-color --pretty=format:%B ${{ github.sha }})" >> $GITHUB_OUTPUT
 
-      - uses: softprops/action-gh-release@v1
+      - uses: svenstaro/upload-release-action@2.7.0          
         with:
-          files: dist/ScoutsTrainingBot.exe
-          name: Scouts Training Bot v-${{ steps.vars.outputs.sha_short }}
+          file: dist/ScoutsTrainingBot.exe
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: Scouts Training Bot v-${{ steps.vars.outputs.sha_short }}
           body: |
             [${{ steps.vars.outputs.commit_msg }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
