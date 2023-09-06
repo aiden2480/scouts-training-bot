@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
-    name: Install Python and requirements
+  build:
+    name: Build via pyinstaller
     runs-on: windows-latest
 
     steps:
@@ -19,14 +19,13 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: pip install pyinstaller
-
-  build:
-    name: Build via pyinstaller
-    runs-on: windows-latest
-    needs: setup
-
-    steps:
-      - run: pyinstaller --onefile --icon=.github\workflows\app.ico --add-data "js/*;js" --name ScoutsTrainingBot main.py
+      
+      - name: Generate executable
+        run: pyinstaller --onefile --icon=.github\workflows\app.ico --add-data "js/*;js" --name ScoutsTrainingBot main.py
+      
+      - uses: actions/upload-artifact@v3
+        with:
+          path: dist/ScoutsTrainingBot.exe
 
   release:
     name: GitHub Release
@@ -34,6 +33,7 @@ jobs:
     needs: build
 
     steps:
+      - uses: actions/download-artifact@v3
       - id: vars
         run: |
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
