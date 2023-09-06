@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from typing import Literal, Optional
 
@@ -60,6 +61,9 @@ def create_webdriver() -> webdriver.Chrome:
 
 def get_creds(env_file: str = ".env") -> Optional[dict]:
     is_valid = lambda i: i.count("=") == 1 and not i.startswith("#")
+
+    if not os.path.isfile(env_file):
+        return
 
     with open(env_file) as fp:
         lines = [i for i in fp.readlines() if is_valid(i)]
