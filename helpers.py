@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Literal, Optional
 
-import requests
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
@@ -95,7 +94,3 @@ def get_creds(env_file: str = ".env") -> Optional[dict]:
     env["branch"] = Branches[env["branch"].upper()].value
 
     return env
-
-
-if __name__ == "__main__":
-    print(get_creds())

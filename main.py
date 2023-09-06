@@ -1,12 +1,11 @@
-import base64
-
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from helpers import create_webdriver, determine_object_type, is_object_required, get_creds
+from helpers import (create_webdriver, determine_object_type, get_creds,
+                     is_object_required)
 
 
 # Process module from a link
