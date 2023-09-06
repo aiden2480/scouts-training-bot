@@ -1,0 +1,47 @@
+name: Publish to GitHub Releases
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  setup:
+    name: Install Python and requirements
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v3
+        with:
+          python-version: 3.11
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pip install pyinstaller
+
+  build:
+    name: Build via pyinstaller
+    runs-on: windows-latest
+    needs: setup
+
+    steps:
+      - run: pyinstaller --onefile --icon=.github\workflows\app.ico --add-data "js/*;js" --name ScoutsTrainingBot main.py
+
+  release:
+    name: GitHub Release
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - id: vars
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "commit_msg=$(git show -s --no-color --pretty=format:%B ${{ github.sha }})" >> $GITHUB_OUTPUT
+
+      - uses: svenstaro/upload-release-action@2.7.0
+        with:
+          file: dist/ScoutsTrainingBot.exe
+          release_name: Scouts Training Bot v-${{ steps.vars.outputs.sha_short }}
+          body: |
+            [${{ steps.vars.outputs.commit_msg }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
