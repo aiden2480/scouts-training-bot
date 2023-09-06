@@ -1,3 +1,5 @@
+import os
+
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -5,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from helpers import (create_webdriver, determine_object_type, get_creds,
-                     is_object_required)
+                     get_cwd, is_object_required)
 
 
 # Process module from a link
@@ -77,7 +79,7 @@ def process_module(module_link: str) -> None:
         print(f"[MODULE] Marking emodule {name!r} as complete")
         browser.get(link)
 
-        with open("js/emod.js") as fp:
+        with open(os.path.join(get_cwd(), "js/emod.js")) as fp:
             browser.execute_script(fp.read())
     
     # Check if post module test exists
@@ -105,14 +107,14 @@ def mark_video_complete(obj: WebElement) -> None:
     video = obj.find_element(By.CLASS_NAME, "video-object")
     objid = video.get_attribute("data-object-id")
     
-    with open("js/video.js") as fp:
+    with open(os.path.join(get_cwd(), "js/video.js")) as fp:
         browser.execute_script(fp.read(), objid)
 
 def mark_document_complete(obj: WebElement) -> None:
     document = obj.find_element(By.CLASS_NAME, "document-object")
     objid = document.get_attribute("data-object-id")
 
-    with open("js/document.js") as fp:
+    with open(os.path.join(get_cwd(), "js/document.js")) as fp:
         browser.execute_script(fp.read(), objid)
 
 def complete_postmod_quiz(quiz_link: str, possible_answers = None) -> None:
@@ -136,11 +138,11 @@ def complete_postmod_quiz(quiz_link: str, possible_answers = None) -> None:
         for answer in answers_elems:
             possible_answers[id].append(answer.get_attribute("value"))
 
-    with open("js/postmodquiz.js") as fp:
+    with open(os.path.join(get_cwd(), "js/postmodquiz.js")) as fp:
         completed_url = browser.execute_script(fp.read(), possible_answers)
     
-    with open("js/extractpostmod.js") as fp:
-        browser.get(completed_url)
+    browser.get(completed_url)
+    with open(os.path.join(get_cwd(), "js/extractpostmod.js")) as fp:
         completed, possible_answers = browser.execute_script(fp.read(), possible_answers)
 
     if not completed:

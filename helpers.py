@@ -1,4 +1,5 @@
 import os
+import sys
 from enum import Enum
 from typing import Literal, Optional
 
@@ -21,6 +22,12 @@ class Branches(Enum):
     WA = "Western Australia"
     INT = "International"
 
+
+def get_cwd() -> str:
+    if getattr(sys, "frozen", None) and hasattr(sys, "_MEIPASS"):
+        return sys._MEIPASS
+    
+    return os.getcwd()
 
 def is_object_required(obj: WebElement) -> bool:
     """Determines whether an object is marked as mandatory training"""
