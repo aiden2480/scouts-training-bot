@@ -191,7 +191,7 @@ for module in browser.find_elements(By.CLASS_NAME, "learning-module"):
     uncompleted_modules.append((name, link))
 
 for name, link in uncompleted_modules:
-    final_module_quiz_required = process_module(link)
+    process_module(link)
 
 # Go back to main page
 browser.get("https://training.scouts.com.au")
