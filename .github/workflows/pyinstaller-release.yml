@@ -40,13 +40,13 @@ jobs:
         shell: bash
 
       - name: Generate executable
-        run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*${{ steps.delim.outputs.delim }}js" --distpath dist/${{ matrix.os }} --name ScoutsTrainingBot-${{ matrix.os }} main.py
+        run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*${{ steps.delim.outputs.delim }}js" --name ScoutsTrainingBot-${{ matrix.os }} main.py
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          path: dist/${{ matrix.os }}/*
+          path: dist/*
       
   publish:
     name: Publish builds
@@ -63,10 +63,6 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v3
-        with:
-          path: dist
-
-      - run: ls -R
 
       - name: Extract git info
         id: vars
@@ -95,7 +91,7 @@ jobs:
       - name: Upload Release
         uses: svenstaro/upload-release-action@2.7.0          
         with:
-          file: dist/*
+          file: artifact/*
           file_glob: true
           release_name: Scouts Training Bot • Release ${{ steps.vars.outputs.sha_short }}
           tag: ${{ steps.vars.outputs.commit_tag }}
