@@ -43,7 +43,7 @@ jobs:
             body+="<img src='.github/workflows/app.ico' width='15' height='15'> "
             body+="[$sha_short](https://github.com/aiden2480/scouts-training-bot/commit/$commit)"
             body+=" - $commit_msg"
-            body+="\n"
+            body+=$'\n'
           done
 
           body="${body//'%'/'%25'}"
