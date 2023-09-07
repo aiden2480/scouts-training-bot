@@ -34,9 +34,10 @@ jobs:
         shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "commit_tag=$(git log -n1 --format='%at' | xargs -I{} date -d @{} +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_OUTPUT
           
           body=""
-          for commit in $(git rev-list a68075a133c58152026a3a00f0ac8f97fef417be..HEAD); do
+          for commit in $(git rev-list ${{ github.event.before }}..HEAD); do
             commit_msg=$(git show -s --no-color --pretty=format:%B $commit)
             sha_short=$(git rev-parse --short $commit)
             
@@ -58,7 +59,7 @@ jobs:
           file: dist/main.exe
           asset_name: ScoutsTrainingBot.exe
           release_name: Scouts Training Bot • Release ${{ steps.vars.outputs.sha_short }}
-          tag: ${{ steps.vars.outputs.sha_short }}
+          tag: ${{ steps.vars.outputs.commit_tag }}
           body: |
             ${{ steps.vars.outputs.commits_list }}
 
