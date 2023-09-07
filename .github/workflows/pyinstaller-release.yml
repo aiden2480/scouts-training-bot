@@ -32,7 +32,19 @@ jobs:
         shell: bash
         run: |
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "commit_msg=$(git show -s --no-color --pretty=format:%B HEAD)" >> $GITHUB_OUTPUT
+          
+          body=""
+          for commit in $(git rev-list ${{ github.event.before }}..${{ github.sha }}); do
+            commit_msg=$(git show -s --no-color --pretty=format:%B $commit)
+            sha_short=$(git rev-parse --short $commit)
+            
+            body+="<img src='.github/workflows/app.ico' width='15' height='15'> "
+            body+="[$sha_short](https://github.com/aiden2480/scouts-training-bot/commit/$commit)"
+            body+=" - $commit_msg"
+            body+="\n"
+          done
+
+          echo -e "commits_list=$body" >> $GITHUB_OUTPUT
 
       - name: Upload Release
         uses: svenstaro/upload-release-action@2.7.0          
@@ -42,6 +54,6 @@ jobs:
           release_name: Scouts Training Bot • Release ${{ steps.vars.outputs.sha_short }}
           tag: ${{ steps.vars.outputs.sha_short }}
           body: |
-            <img src=".github/workflows/app.ico" width="15" height="15"> [${{ steps.vars.outputs.sha_short }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) - ${{ steps.vars.outputs.commit_msg }}
+            ${{ steps.vars.outputs.commits_list }}
 
             Download ScoutsTrainingBot.exe below for windows
