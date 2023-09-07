@@ -36,7 +36,7 @@ jobs:
           echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           
           body=""
-          for commit in $(git rev-list ${{ github.event.before }}..${{ github.sha }}); do
+          for commit in $(git rev-list a68075a133c58152026a3a00f0ac8f97fef417be..HEAD); do
             commit_msg=$(git show -s --no-color --pretty=format:%B $commit)
             sha_short=$(git rev-parse --short $commit)
             
@@ -46,7 +46,11 @@ jobs:
             body+="\n"
           done
 
-          echo -e "commits_list=$body" >> $GITHUB_OUTPUT
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+
+          echo "commits_list=$body" >> $GITHUB_OUTPUT
 
       - name: Upload Release
         uses: svenstaro/upload-release-action@2.7.0          
