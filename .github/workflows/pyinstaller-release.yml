@@ -29,18 +29,19 @@ jobs:
       
       - name: Extract git info
         id: vars
+        shell: bash
         run: |
-          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-          echo "::set-output name=commit_msg::$(git show -s --no-color --pretty=format:%B HEAD)"
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "commit_msg=$(git show -s --no-color --pretty=format:%B HEAD)"
 
       - name: Upload Release
         uses: svenstaro/upload-release-action@2.7.0          
         with:
           file: dist/main.exe
           asset_name: ScoutsTrainingBot.exe
-          release_name: Scouts Training Bot • ${{ steps.vars.outputs.sha_short }}
+          release_name: Scouts Training Bot • Release ${{ steps.vars.outputs.sha_short }}
           tag: ${{ steps.vars.outputs.sha_short }}
           body: |
-            [${{ steps.vars.outputs.sha_short }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) - ${{ steps.vars.outputs.commit_msg }}
+            <img src=".github/workflows/app.ico" width="15" height="15"> [${{ steps.vars.outputs.sha_short }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) - ${{ steps.vars.outputs.commit_msg }}
 
             Download ScoutsTrainingBot.exe below for windows
