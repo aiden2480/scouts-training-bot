@@ -33,9 +33,9 @@ jobs:
         id: delim
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            echo "delim=;" >> $GITHUB_ENV
+            echo "delim=;" >> $GITHUB_OUTPUT
           else
-            echo "delim=:" >> $GITHUB_ENV
+            echo "delim=:" >> $GITHUB_OUTPUT
           fi
         shell: bash
 
