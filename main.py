@@ -162,11 +162,12 @@ if creds:
     browser.find_element(By.ID, "branch").send_keys(creds["branch"])
     browser.find_element(By.ID, "number").send_keys(creds["username"])
     browser.find_element(By.ID, "password").send_keys(creds["password"])
-    browser.find_element(By.ID, "login-submit").click() # TODO incorrect login details check
+    browser.find_element(By.ID, "login-submit").click()
 else:
     print("Please login to the portal webpage")
-    url_equals_homepage = EC.url_to_be("https://training.scouts.com.au/curriculums/index")
-    WebDriverWait(browser, float("inf"), 0.1).until(url_equals_homepage)
+
+url_equals_homepage = EC.url_to_be("https://training.scouts.com.au/curriculums/index")
+WebDriverWait(browser, float("inf"), 0.1).until(url_equals_homepage)
 
 # Determine which modules need to be completed
 my_training = browser.find_element(By.CLASS_NAME, "curriculum-summary-container")
