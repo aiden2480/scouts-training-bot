@@ -29,8 +29,18 @@ jobs:
       - name: Install required packages
         run: pip install -r requirements.txt pyinstaller
       
+      - name: Set Delimiter
+        id: delim
+        run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            echo "delim=;" >> $GITHUB_ENV
+          else
+            echo "delim=:" >> $GITHUB_ENV
+          fi
+        shell: bash
+
       - name: Generate executable
-        run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*;js" --distpath dist/${{ matrix.os }} --name ScoutsTrainingBot main.py
+        run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*${{ steps.delim.outputs.delim }}js" --distpath dist/${{ matrix.os }} --name ScoutsTrainingBot main.py
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
