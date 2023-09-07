@@ -98,4 +98,4 @@ jobs:
           body: |
             ${{ steps.vars.outputs.commits_list }}
 
-            Download ScoutsTrainingBot.exe below for windows
+            Download ScoutsTrainingBot for windows, macos, or ubuntu below
