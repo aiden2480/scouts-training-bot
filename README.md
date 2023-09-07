@@ -2,9 +2,9 @@
 A script written in Python with Selenium to log in to the scouts training website and automatically complete all training modules, watch all videos, open all required documents, and take all tests.
 
 <div align="center">
-    <img src="https://img.shields.io/github/last-commit/aiden2480/scouts-trianing-bot?color=yellow" alt="Last commit" />
-    <img src="https://img.shields.io/github/license/aiden2480/scouts-trianing-bot" alt="Licence" />
-    <img src="https://img.shields.io/github/languages/code-size/aiden2480/scouts-trianing-bot" alt="Code size" />
+    <img src="https://img.shields.io/github/last-commit/aiden2480/scouts-training-bot?color=yellow" alt="Last commit" />
+    <img src="https://img.shields.io/github/license/aiden2480/scouts-training-bot" alt="Licence" />
+    <img src="https://img.shields.io/github/languages/code-size/aiden2480/scouts-training-bot" alt="Code size" />
 </div>
 
 ## :key: Setup
