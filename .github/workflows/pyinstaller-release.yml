@@ -29,18 +29,20 @@ jobs:
       - name: Install required packages
         run: pip install -r requirements.txt pyinstaller
       
-      - name: Set Delimiter
-        id: delim
+      - name: Set env variables
+        id: vars
+        shell: bash
         run: |
+          echo "name=ScoutsTrainingBot-$(echo ${{ matrix.os }} | sed 's/-latest//')" >> $GITHUB_OUTPUT
+
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             echo "delim=;" >> $GITHUB_OUTPUT
           else
             echo "delim=:" >> $GITHUB_OUTPUT
           fi
-        shell: bash
 
       - name: Generate executable
-        run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*${{ steps.delim.outputs.delim }}js" --name ScoutsTrainingBot-${{ matrix.os }} main.py
+        run: pyinstaller --onefile --icon=".github\workflows\app.ico" --add-data="js/*${{ steps.vars.outputs.delim }}js" --name ${{ steps.vars.outputs.name }} main.py
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
@@ -64,7 +66,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
 
-      - name: Extract git info
+      - name: Set env variables
         id: vars
         shell: bash
         run: |
