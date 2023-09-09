@@ -36,11 +36,11 @@ jobs:
           app_name=ScoutsTrainingBot-$(echo ${{ matrix.os }} | sed 's/-latest//')
 
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            pyinstaller --onefile --icon .github/workflows/app.ico --add-data="js/*;js" --name ${app_name}
+            pyinstaller --onefile --icon .github/workflows/app.ico --add-data="js/*;js" --name ${app_name} main.py
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            pyinstaller --onefile -w --icon .github/workflows/app.ico --add-data="js/*:js" --name ${app_name}
+            pyinstaller --onefile -w --icon .github/workflows/app.ico --add-data="js/*:js" --name ${app_name} main.py
           elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            pyinstaller --onefile --icon .github/workflows/app.ico --add-data="js/*:js" --name ${app_name}
+            pyinstaller --onefile --icon .github/workflows/app.ico --add-data="js/*:js" --name ${app_name} main.py
           fi
 
       - name: Upload artifacts
