@@ -29,23 +29,20 @@ jobs:
       - name: Install required packages
         run: pip install -r requirements.txt pyinstaller ${{ matrix.os == 'macos-latest' && 'Pillow' || '' }}
 
-      - name: Generate build command
+      - name: Generate executable
         id: vars
         shell: bash
         run: |
           app_name=ScoutsTrainingBot-$(echo ${{ matrix.os }} | sed 's/-latest//')
-          delim=$([[ "${{ matrix.os }}" == "windows-latest" ]] && echo ";" || echo ":");
-          base_command="pyinstaller --onefile --icon .github/workflows/app.ico --add-data='js/*${delim}js' --name ${app_name}"
 
-          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            base_command+=" --noconsole"
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            pyinstaller --onefile --icon .github/workflows/app.ico --add-data="js/*;js" --name ${app_name}
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            pyinstaller --onefile -w --icon .github/workflows/app.ico --add-data="js/*:js" --name ${app_name}
+          elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            pyinstaller --onefile --icon .github/workflows/app.ico --add-data="js/*:js" --name ${app_name}
           fi
 
-          echo "command=$base_command main.py" >> $GITHUB_OUTPUT
-
-      - name: Generate executable
-        run: ${{ steps.vars.outputs.command }}
-      
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
