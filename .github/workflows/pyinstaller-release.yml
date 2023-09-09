@@ -39,7 +39,7 @@ jobs:
         run: |
           app_name=ScoutsTrainingBot-$(echo ${{ matrix.os }} | sed 's/-latest//')
           delim=$([[ "${{ matrix.os }}" == "windows-latest" ]] && echo ";" || echo ":");
-          base_command="pyinstaller --onefile --icon .github/workflows/app.ico --add-data js/*${delim}js --name ${app_name}"
+          base_command="pyinstaller --onefile --icon .github/workflows/app.ico --add-data='js/*${delim}js' --name ${app_name}"
 
           if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             base_command+=" --noconsole"
