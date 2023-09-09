@@ -29,7 +29,11 @@ jobs:
       - name: Install required packages
         run: pip install -r requirements.txt pyinstaller
       
-      - name: Set env variables
+      - name: Macos install Pillow
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: pip install Pillow
+      
+      - name: Generate build command
         id: vars
         shell: bash
         run: |
