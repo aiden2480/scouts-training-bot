@@ -6,21 +6,19 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
-from helpers import (create_webdriver, determine_object_type, get_creds,
-                     get_cwd, is_object_required)
+from helpers import (Module, create_webdriver, determine_object_type,
+                     get_creds, get_cwd, is_object_required)
 
 
 # Process module from a link
-def process_module(module_link: str) -> None:
+def process_module(module: Module) -> None:
     """
         Accepts a module link and navigates to that webpage,
         locates mandatory training, and marks it as completed.
     """
 
-    browser.get(module_link)
-    container = browser.find_element(By.CLASS_NAME, "module-page-container")
-    module_name = container.find_element(By.TAG_NAME, "h1").text
-    print(f"\n[MODULE] Traversing module {module_name!r}")
+    browser.get(module.link)
+    print(f"\n[MODULE] Traversing module {module.name!r}")
 
     # Determine which objects are have already been completed
     all_objects = browser.find_element(By.CLASS_NAME, "learning-object-list")
@@ -189,10 +187,13 @@ for module in browser.find_elements(By.CLASS_NAME, "learning-module"):
         continue
     
     print("[INDEX] Uncompleted module  ", name)
-    uncompleted_modules.append((name, link))
+    uncompleted_modules.append(Module(name, link))
 
-for name, link in uncompleted_modules:
-    process_module(link)
+print("[INDEX] The following modules will now be processed:")
+print(" -", "\n - ".join(map(lambda m: f"{m.name} @ {m.link}", uncompleted_modules)))
+
+for module in uncompleted_modules:
+    process_module(module)
 
 # Go back to main page
 browser.get("https://training.scouts.com.au")

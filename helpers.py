@@ -1,5 +1,6 @@
 import os
 import sys
+from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, Optional
 
@@ -8,6 +9,12 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+
+
+@dataclass
+class Module:
+    name: str
+    link: str
 
 
 class Branches(Enum):
@@ -26,8 +33,9 @@ class Branches(Enum):
 def get_cwd() -> str:
     if getattr(sys, "frozen", None) and hasattr(sys, "_MEIPASS"):
         return sys._MEIPASS
-    
+
     return os.getcwd()
+
 
 def is_object_required(obj: WebElement) -> bool:
     """Determines whether an object is marked as mandatory training"""
@@ -36,8 +44,9 @@ def is_object_required(obj: WebElement) -> bool:
         obj.find_element(By.CLASS_NAME, "required-icon")
     except NoSuchElementException:
         return False
-    
+
     return True
+
 
 def determine_object_type(obj: WebElement) -> Literal["video", "document", "emodule"]:
     """Determines whether a specified object is a video, document, or emodule"""
@@ -52,7 +61,8 @@ def determine_object_type(obj: WebElement) -> Literal["video", "document", "emod
         else:
             return objtype
 
-    raise ValueError("Object type not found")    
+    raise ValueError("Object type not found")
+
 
 def create_webdriver() -> webdriver.Chrome:
     """Creates a webdriver with the given chromedriver version"""
@@ -63,8 +73,9 @@ def create_webdriver() -> webdriver.Chrome:
     options.add_argument("--log-level=3")
     options.add_experimental_option("detach", True)
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
-    
+
     return webdriver.Chrome(options=options)
+
 
 def get_creds(env_file: str = ".env") -> Optional[dict]:
     is_valid = lambda i: i.count("=") == 1 and not i.startswith("#")
@@ -81,7 +92,7 @@ def get_creds(env_file: str = ".env") -> Optional[dict]:
     for line in lines:
         key, value = line.split("=")
         env[key.strip().lower()] = value.strip()
-    
+
     if "branch" not in env:
         missing.append("branch")
     if "username" not in env:
@@ -96,7 +107,7 @@ def get_creds(env_file: str = ".env") -> Optional[dict]:
     if not env["username"].isnumeric():
         print("Username is invalid")
         return
-    
+
     if env["branch"].upper() not in Branches.__members__:
         print("Branch must be one of", ", ".join(Branches.__members__))
         return

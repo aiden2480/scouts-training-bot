@@ -8,7 +8,9 @@ A script written in Python with Selenium to log in to the scouts training websit
 </div>
 
 ## :key: Setup
-Ensure you have Google Chrome installed before running. Run the following commands to install requirements and run the script. If you don't have Python installed, you can [download the latest release for windows](https://github.com/aiden2480/scouts-training-bot/releases/latest) instead.
+The program will run the training curriculum that is currently selected. To change this, login and scroll to the bottom of the index page, then click `Set as My Training` under the desired curriculum.
+
+Ensure you have Google Chrome installed before running. Run the following commands to install requirements and run the script. If you don't have Python installed, you can [download the latest release](https://github.com/aiden2480/scouts-training-bot/releases/latest) instead.
 
 ```
 $ pip install -r requirements.txt
