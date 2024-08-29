@@ -17,7 +17,7 @@ class Module:
     link: str
 
 
-class Branches(Enum):
+class Branch(Enum):
     NAT = "National"
     ACT = "Australian Capital Territory"
     NSW = "New South Wales"
@@ -113,6 +113,6 @@ def get_creds(env_file: str = ".env") -> Optional[dict]:
         return None
 
     # Expand branch code and return
-    env["branch"] = Branches[env["branch"].upper()].value
+    env["branch"] = Branch[env["branch"].upper()].value
 
     return env
