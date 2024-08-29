@@ -9,6 +9,8 @@ from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 
 @dataclass
@@ -116,3 +118,62 @@ def get_creds(env_file: str = ".env") -> Optional[dict]:
     env["branch"] = Branch[env["branch"].upper()].value
 
     return env
+
+
+def get_index_page(browser: Chrome):
+    browser.get("https://training.scouts.com.au")
+
+
+def login_if_creds_provided(browser: Chrome):
+    creds = get_creds()
+
+    if not creds:
+        print("Please login to the portal webpage")
+        return None
+
+    browser.find_element(By.ID, "branch").send_keys(creds["branch"])
+    browser.find_element(By.ID, "number").send_keys(creds["username"])
+    browser.find_element(By.ID, "password").send_keys(creds["password"])
+    browser.find_element(By.ID, "login-submit").click()
+
+
+def wait_for_curriculumns_index_page(browser: Chrome):
+    wait = WebDriverWait(browser, float("inf"), 0.1)
+    url_equals_homepage = EC.url_to_be("https://training.scouts.com.au/curriculums/index")
+    
+    wait.until(url_equals_homepage)
+
+
+def navigate_to_modules_index_page(browser: Chrome):
+    # All the modules are on the same page, so we can just click the first one
+    my_training = browser.find_element(By.CLASS_NAME, "curriculum-summary-container")
+    my_training.find_element(By.XPATH, "./*").click()
+
+
+def get_uncompleted_modules(browser: Chrome) -> list[Module]:
+    modules = []
+
+    for module_elem in browser.find_elements(By.CLASS_NAME, "learning-module"):
+        name = module_elem.find_element(By.CLASS_NAME, "module-name").text
+        link = module_elem.find_element(By.XPATH, "..").get_attribute("href")
+        image = module_elem.find_element(By.TAG_NAME, "img")
+        src = image.get_attribute("src")
+
+        assert src is not None, f"Image does not have src tag for {name}"
+        assert link is not None, f"Link was none for {name}"
+
+        if "coming-soon" in src: # Module is unavailable
+            print("[INDEX] Skipping unavailable", name)
+            continue
+        
+        if "checked-green" in src: # Module is already completed
+            print("[INDEX] Skipping completed  ", name)
+            continue
+        
+        print("[INDEX] Uncompleted module  ", name)
+        modules.append(Module(name, link))
+    
+    print("[INDEX] The following modules will now be processed:")
+    print(" -", "\n - ".join(map(lambda m: f"{m.name} @ {m.link}", modules)))
+
+    return modules
