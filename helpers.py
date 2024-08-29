@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, Optional
 
-from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -64,7 +64,7 @@ def determine_object_type(obj: WebElement) -> Literal["video", "document", "emod
     raise ValueError("Object type not found")
 
 
-def create_webdriver() -> webdriver.Chrome:
+def create_webdriver() -> Chrome:
     """Creates a webdriver with the given chromedriver version"""
 
     options = Options()
@@ -74,14 +74,14 @@ def create_webdriver() -> webdriver.Chrome:
     options.add_experimental_option("detach", True)
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-    return webdriver.Chrome(options=options)
+    return Chrome(options=options)
 
 
 def get_creds(env_file: str = ".env") -> Optional[dict]:
     is_valid = lambda i: i.count("=") == 1 and not i.startswith("#")
 
     if not os.path.isfile(env_file):
-        return
+        return None
 
     with open(env_file) as fp:
         lines = [i for i in fp.readlines() if is_valid(i)]
@@ -102,15 +102,15 @@ def get_creds(env_file: str = ".env") -> Optional[dict]:
 
     if len(missing):
         print("Not all required values passed: missing", ", ".join(missing))
-        return
+        return None
 
     if not env["username"].isnumeric():
         print("Username is invalid")
-        return
+        return None
 
-    if env["branch"].upper() not in Branches.__members__:
-        print("Branch must be one of", ", ".join(Branches.__members__))
-        return
+    if env["branch"].upper() not in Branch.__members__:
+        print("Branch must be one of", ", ".join(Branch.__members__))
+        return None
 
     # Expand branch code and return
     env["branch"] = Branches[env["branch"].upper()].value
