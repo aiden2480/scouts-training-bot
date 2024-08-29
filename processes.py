@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
@@ -54,7 +55,7 @@ def process_module(browser: Chrome, module: helpers.Module):
             name = object.find_element(By.CLASS_NAME, "title-text").text
             print(f"[MODULE] Marking video {name!r} complete")
 
-            mark_video_complete(object)
+            mark_video_complete(browser, object)
 
         if helpers.determine_object_type(object) == "emodule":
             parent = object.find_element(By.CLASS_NAME, "emodule-object")
@@ -74,10 +75,7 @@ def process_module(browser: Chrome, module: helpers.Module):
     # Now all emodule links need to be opened and processed
     for name, link in emodules:
         print(f"[MODULE] Marking emodule {name!r} as complete")
-        browser.get(link)
-
-        with open(os.path.join(helpers.get_cwd(), "js/emod.js")) as fp:
-            browser.execute_script(fp.read())
+        mark_emodule_complete(browser, link)
     
     # Check if post module test exists
     try:
@@ -104,15 +102,22 @@ def mark_video_complete(browser: Chrome, obj: WebElement):
     video = obj.find_element(By.CLASS_NAME, "video-object")
     objid = video.get_attribute("data-object-id")
     
-    with open(os.path.join(helpers.get_cwd(), "js/video.js")) as fp:
-        browser.execute_script(fp.read(), objid)
+    execute_js(browser, "js/video.js", objid)
 
 def mark_document_complete(browser: Chrome, obj: WebElement):
     document = obj.find_element(By.CLASS_NAME, "document-object")
     objid = document.get_attribute("data-object-id")
 
-    with open(os.path.join(helpers.get_cwd(), "js/document.js")) as fp:
-        browser.execute_script(fp.read(), objid)
+    execute_js(browser, "js/document.js", objid)
+
+def mark_emodule_complete(browser: Chrome, link: str):
+    browser.get(link)
+
+    execute_js(browser, "js/emod.js")
+
+def execute_js(browser: Chrome, src: str, *args) -> Any:
+    with open(os.path.join(helpers.get_cwd(), src)) as fp:
+        return browser.execute_script(fp.read(), *args)
 
 def complete_postmod_quiz(browser: Chrome, quiz_link: str, possible_answers = None):
     browser.get(quiz_link)
@@ -135,12 +140,10 @@ def complete_postmod_quiz(browser: Chrome, quiz_link: str, possible_answers = No
         for answer in answers_elems:
             possible_answers[id].append(answer.get_attribute("value"))
 
-    with open(os.path.join(helpers.get_cwd(), "js/postmodquiz.js")) as fp:
-        completed_url = browser.execute_script(fp.read(), possible_answers)
+    completed_url = execute_js(browser, "js/postmodquiz.js", possible_answers)
     
     browser.get(completed_url)
-    with open(os.path.join(helpers.get_cwd(), "js/extractpostmod.js")) as fp:
-        completed, possible_answers = browser.execute_script(fp.read(), possible_answers)
+    completed, possible_answers = execute_js(browser, "js/extractpostmod.js", possible_answers)
 
     if not completed:
         correct = len([i for i in possible_answers.values() if len(i) == 1])
