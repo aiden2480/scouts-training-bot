@@ -146,8 +146,8 @@ def wait_for_curriculumns_index_page(browser: Chrome):
 
 def navigate_to_modules_index_page(browser: Chrome):
     # All the modules are on the same page, so we can just click the first one
-    my_training = browser.find_element(By.CLASS_NAME, "curriculum-summary-container")
-    my_training.find_element(By.XPATH, "./*").click()
+    my_training = browser.find_element(By.CLASS_NAME, "curriculum-summary-title")
+    my_training.find_element(By.XPATH, "a/*").click()
 
 
 def get_uncompleted_modules(browser: Chrome) -> list[Module]:
@@ -160,17 +160,16 @@ def get_uncompleted_modules(browser: Chrome) -> list[Module]:
         src = image.get_attribute("src")
 
         assert src is not None, f"Image does not have src tag for {name}"
-        assert link is not None, f"Link was none for {name}"
 
-        if "coming-soon" in src: # Module is unavailable
-            print("[INDEX] Skipping unavailable", name)
+        if "coming-soon" in src or link is None: # Module is unavailable
+            print(f"[INDEX] Skipping unavailable ->", name)
             continue
         
         if "checked-green" in src: # Module is already completed
-            print("[INDEX] Skipping completed  ", name)
+            print(f"[INDEX] Skipping completed   ->", name)
             continue
         
-        print("[INDEX] Uncompleted module  ", name)
+        print(f"[INDEX] Uncompleted module   ->", name)
         modules.append(Module(name, link))
     
     print("[INDEX] The following modules will now be processed:")
