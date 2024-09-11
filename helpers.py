@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, Optional
 
+from rich import get_console
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
@@ -103,7 +104,6 @@ def get_creds(env_file: str = ".env") -> Optional[dict]:
         missing.append("password")
 
     if len(missing):
-        print("Not all required values passed: missing", ", ".join(missing))
         return None
 
     if not env["username"].isnumeric():
@@ -128,7 +128,6 @@ def login_if_creds_provided(browser: Chrome):
     creds = get_creds()
 
     if not creds:
-        print("Please login to the portal webpage")
         return None
 
     browser.find_element(By.ID, "branch").send_keys(creds["branch"])
@@ -140,7 +139,7 @@ def login_if_creds_provided(browser: Chrome):
 def wait_for_curriculumns_index_page(browser: Chrome):
     wait = WebDriverWait(browser, float("inf"), 0.1)
     url_equals_homepage = EC.url_to_be("https://training.scouts.com.au/curriculums/index")
-    
+
     wait.until(url_equals_homepage)
 
 
@@ -152,6 +151,8 @@ def navigate_to_modules_index_page(browser: Chrome):
 
 def get_uncompleted_modules(browser: Chrome) -> list[Module]:
     modules = []
+    console = get_console()
+    console.rule("Determining uncompleted modules")
 
     for module_elem in browser.find_elements(By.CLASS_NAME, "learning-module"):
         name = module_elem.find_element(By.CLASS_NAME, "module-name").text
@@ -162,17 +163,23 @@ def get_uncompleted_modules(browser: Chrome) -> list[Module]:
         assert src is not None, f"Image does not have src tag for {name}"
 
         if "coming-soon" in src or link is None: # Module is unavailable
-            print(f"[INDEX] Skipping unavailable ->", name)
+            console.print(f"Skipping unavailable [grey46]{name}[/]")
             continue
         
         if "checked-green" in src: # Module is already completed
-            print(f"[INDEX] Skipping completed   ->", name)
+            console.print(f"Skipping completed [grey46]{name}[/]")
             continue
         
-        print(f"[INDEX] Uncompleted module   ->", name)
+        console.print(f"Uncompleted module [green]{name}[/]")
         modules.append(Module(name, link))
     
-    print("[INDEX] The following modules will now be processed:")
-    print(" -", "\n - ".join(map(lambda m: f"{m.name} @ {m.link}", modules)))
+    if len(modules) == 0:
+        console.print("\n[orange1]Could not find any modules that require completion[/]")
+        return modules
+
+    console.print("\n[orange1]The following modules will be processed[/]:")
+
+    for module in modules:
+        console.print(f" - [green]{module.name}[/] @ [cyan]{module.link}[/]")
 
     return modules

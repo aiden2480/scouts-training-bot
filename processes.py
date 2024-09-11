@@ -1,6 +1,7 @@
 import os
 from typing import Any
 
+from rich import get_console
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
@@ -13,6 +14,7 @@ import helpers
 
 # Constants
 EXAM_BLOCK_LOCATOR = (By.CLASS_NAME, "exam-container")
+console = get_console()
 
 
 def process_module(browser: Chrome, module: helpers.Module):
@@ -21,8 +23,9 @@ def process_module(browser: Chrome, module: helpers.Module):
         locates mandatory training, and marks it as completed.
     """
 
+    console.print()
+    console.rule(f"Traversing module [green]{module.name}[/]", )
     browser.get(module.link)
-    print(f"\n[MODULE] Traversing module {module.name!r}")
 
     # Determine which objects are have already been completed
     all_objects = browser.find_element(By.CLASS_NAME, "learning-object-list")
@@ -48,7 +51,7 @@ def process_module(browser: Chrome, module: helpers.Module):
         if title not in already_completed:
             uncompleted.append(object)
         else:
-            print(f"[MODULE] Skipping completed object {title!r}")
+            console.print(f"Skipping completed object [grey46]{title}[/]")
 
     # For video and document objects, we can simply send a request to the API
     # to mark the object as complete, but for emodules, we need to access the
@@ -57,7 +60,7 @@ def process_module(browser: Chrome, module: helpers.Module):
     for object in uncompleted:
         if helpers.determine_object_type(object) == "video":
             name = object.find_element(By.CLASS_NAME, "title-text").text
-            print(f"[MODULE] Marking video {name!r} complete")
+            console.print(f"Marking video [blue]{name}[/] complete")
 
             mark_video_complete(browser, object)
 
@@ -65,33 +68,33 @@ def process_module(browser: Chrome, module: helpers.Module):
             parent = object.find_element(By.CLASS_NAME, "emodule-object")
             href = parent.find_element(By.TAG_NAME, "a")
             name = object.find_element(By.CLASS_NAME, "title-text").text
-            print(f"[MODULE] Enqueuing emodule {name!r}")
+            console.print(f"Enqueuing emodule [blue]{name}[/]")
 
             link = "https://training.scouts.com.au" + href.get_attribute("data-url")
             emodules.append((name, link)) # Queue for processing
 
         if helpers.determine_object_type(object) == "document":
             name = object.find_element(By.CLASS_NAME, "title-text").text
-            print(f"[MODULE] Marking document {name!r} complete")
+            console.print(f"Marking document [blue]{name}[/] complete")
 
             mark_document_complete(browser, object)
     
     # Now all emodule links need to be opened and processed
     for name, link in emodules:
-        print(f"[MODULE] Marking emodule {name!r} as complete")
+        console.print(f"Marking emodule [blue]{name}[/] as complete")
         mark_emodule_complete(browser, link)
     
     # Check if post module test exists
     try:
         pte = browser.find_element(By.XPATH, "//img[@title='post-test exam']")
     except NoSuchElementException:
-        print("[MODULE] No post-module exam required")
+        console.print("[grey46]No post-module exam required[/]")
         return
     
     try:
         pte.find_element(By.XPATH, "../../../../*[1]/img")
     except NoSuchElementException:
-        print("[MODULE] Opening post-module exam")
+        console.print("Opening [orange1]post-module exam[/]")
         pte.click()
 
         # Wait until the exam has loaded
@@ -100,7 +103,7 @@ def process_module(browser: Chrome, module: helpers.Module):
 
         complete_postmod_quiz(browser, browser.current_url)
     else:
-        print("[MODULE] Skipping completed post-module exam")
+        console.print("[grey46]Skipping completed post-module exam[/]")
 
 def mark_video_complete(browser: Chrome, obj: WebElement):
     video = obj.find_element(By.CLASS_NAME, "video-object")
@@ -153,7 +156,7 @@ def complete_postmod_quiz(browser: Chrome, quiz_link: str, possible_answers = No
         correct = len([i for i in possible_answers.values() if len(i) == 1])
         total = len(possible_answers)
 
-        print(f"[EXAM] {correct}/{total} exam questions correct")
+        console.print(f"[red]{correct}/{total}[/] exam questions correct")
         complete_postmod_quiz(browser, quiz_link, possible_answers)
     else:
-        print("[EXAM] Exam pass mark achieved")
+        console.print("[green]Exam pass mark achieved[/]")
