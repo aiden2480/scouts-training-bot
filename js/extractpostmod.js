@@ -1,10 +1,10 @@
-var answersElems = document.querySelector(".public-exam-block").children;
+var questionsElems = document.querySelectorAll(".question");
 var result = arguments[0];
 
 console.log(JSON.parse(JSON.stringify(result)));
 
-for (let i = 0; i < answersElems.length; i++) {
-    let questionElem = answersElems[i].children[0];
+for (let i = 0; i < questionsElems.length; i++) {
+    let questionElem = questionsElems[i];
     let questionId = questionElem.getAttribute("id");
     let selectedElem = questionElem.querySelector("[checked]");
     let selectedId = selectedElem.getAttribute("value");

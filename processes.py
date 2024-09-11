@@ -11,6 +11,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 import helpers
 
 
+# Constants
+EXAM_BLOCK_LOCATOR = (By.CLASS_NAME, "exam-container")
+
+
 def process_module(browser: Chrome, module: helpers.Module):
     """
         Accepts a module link and navigates to that webpage,
@@ -91,7 +95,7 @@ def process_module(browser: Chrome, module: helpers.Module):
         pte.click()
 
         # Wait until the exam has loaded
-        cond = EC.presence_of_element_located((By.CLASS_NAME, "public-exam-block"))
+        cond = EC.presence_of_element_located(EXAM_BLOCK_LOCATOR)
         WebDriverWait(browser, 10, 0.1).until(cond)
 
         complete_postmod_quiz(browser, browser.current_url)
@@ -126,7 +130,7 @@ def complete_postmod_quiz(browser: Chrome, quiz_link: str, possible_answers = No
         possible_answers = {}
 
     # Extract possible questions and answers
-    container_elem = browser.find_element(By.CLASS_NAME, "public-exam-block")
+    container_elem = browser.find_element(*EXAM_BLOCK_LOCATOR)
     questions_elems = container_elem.find_elements(By.CLASS_NAME, "question-column")
 
     for question in questions_elems:
