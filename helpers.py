@@ -52,17 +52,23 @@ def is_object_required(obj: WebElement) -> bool:
 
 
 def determine_object_type(obj: WebElement) -> Literal["video", "document", "emodule"]:
-    """Determines whether a specified object is a video, document, or emodule"""
+    """Determines the learning module type of the object"""
 
     types = ["video", "document", "emodule"]
+
+    # god forbid we have any kind of internal consistency
+    try:
+        obj.find_element(By.CLASS_NAME, "video-modal-link-js")
+        return "video"
+    except NoSuchElementException:
+        pass
 
     for objtype in types:
         try:
             obj.find_element(By.CLASS_NAME, f"{objtype}-object")
+            return objtype
         except NoSuchElementException:
             continue
-        else:
-            return objtype
 
     raise ValueError("Object type not found")
 
@@ -157,7 +163,7 @@ def get_uncompleted_modules(browser: Chrome) -> list[Module]:
     for module_elem in browser.find_elements(By.CLASS_NAME, "learning-module"):
         name = module_elem.find_element(By.CLASS_NAME, "module-name").text
         link = module_elem.find_element(By.XPATH, "..").get_attribute("href")
-        image = module_elem.find_element(By.TAG_NAME, "img")
+        image = module_elem.find_element(By.CLASS_NAME, "module-progress-image").find_element(By.TAG_NAME, "img")
         src = image.get_attribute("src")
 
         assert src is not None, f"Image does not have src tag for {name}"
@@ -166,7 +172,7 @@ def get_uncompleted_modules(browser: Chrome) -> list[Module]:
             console.print(f"Skipping unavailable [grey46]{name}[/]")
             continue
         
-        if "checked-green" in src: # Module is already completed
+        if "checked" in src: # Module is already completed
             console.print(f"Skipping completed [grey46]{name}[/]")
             continue
         

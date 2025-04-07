@@ -1,5 +1,5 @@
 var token = document.querySelector("meta[name=csrf-token]").content;
-var video = document.querySelector('video[data-object-id="' + arguments[0] + '"]');
+var video = document.querySelector('video[id="' + arguments[0] + '"]');
 var data = new FormData();
 
 data.append("object_id", arguments[0]);
@@ -13,4 +13,6 @@ fetch("https://training.scouts.com.au/learning_object_members/set_completion?lea
     headers: {
         "X-Csrf-Token": token,
     },
+}).then((resp) => {
+    document.querySelector("a.btn-close").click();
 });

@@ -106,9 +106,18 @@ def process_module(browser: Chrome, module: helpers.Module):
         console.print("[grey46]Skipping completed post-module exam[/]")
 
 def mark_video_complete(browser: Chrome, obj: WebElement):
-    video = obj.find_element(By.CLASS_NAME, "video-object")
+    video = obj.find_element(By.CLASS_NAME, "video-modal-link-js")
     objid = video.get_attribute("data-object-id")
-    
+    video.click()
+
+    # wait for video to appear
+    cond = EC.presence_of_element_located((By.ID, objid))
+    WebDriverWait(browser, 10, 0.1).until(cond)
+
+    # wait for video to be ready
+    cond = lambda d: d.execute_script(f"return document.querySelector('video[id=\"{objid}\"').readyState") == 4
+    WebDriverWait(browser, 10, 0.1).until(cond)
+
     execute_js(browser, "js/video.js", objid)
 
 def mark_document_complete(browser: Chrome, obj: WebElement):
