@@ -46,6 +46,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
+          name: ${{ matrix.os }}
           if-no-files-found: error
           path: dist/*
       
